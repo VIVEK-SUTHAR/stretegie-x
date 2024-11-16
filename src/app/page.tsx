@@ -1,8 +1,8 @@
-import LendingPage from '@/components/Hero'
+import LandingPage from '@/components/Hero'
 import Image from 'next/image'
 
 export default function Home() {
   return (
-    <LendingPage />
+    <LandingPage />
   )
 }
