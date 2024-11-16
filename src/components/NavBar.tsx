@@ -1,7 +1,9 @@
+"use client";
 import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { WalletDefault } from "@coinbase/onchainkit/wallet";
+import Login from "./ConnectWallet";
 
 function NavBar() {
   return (
@@ -39,7 +41,7 @@ function NavBar() {
         </Link>
       </nav>
 
-      <WalletDefault />
+      <Login />
     </header>
   );
 }

@@ -65,9 +65,11 @@ export default function StrategyXLanding() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-200 transform hover:scale-105">
-                  Explore Strategies
-                </Button>
+                <a href="/strategies">
+                  <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold py-2 px-6 rounded-full transition-all duration-200 transform hover:scale-105">
+                    Explore Strategies
+                  </Button>
+                </a>
                 <Button
                   variant="outline"
                   className="border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all duration-200"
