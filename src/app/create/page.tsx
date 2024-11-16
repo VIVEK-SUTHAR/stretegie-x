@@ -1,15 +1,62 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { TrendingUp, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useCreateStrategy } from "@/lib/hooks/useCreateStrategy";
 
 export default function CreateStrategyPage() {
   const [riskLevel, setRiskLevel] = useState(50);
+  const { createStrategy, isLoading, error } = useCreateStrategy();
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    token: "",
+    blockchain: "",
+    lendingProtocol: "",
+    swappingProtocol: "",
+    expectedApy: 0,
+    riskLevel: 50,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      console.log("this is formData", formData);
+
+      const contractAddress = await createStrategy(formData);
+      // Handle success - maybe redirect to the strategy page
+      console.log("Strategy created with contract:", contractAddress);
+    } catch (err) {
+      console.error("Failed to create strategy:", err);
+    }
+  };
+
+  const handleInputChange = (field: string) => (e: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const handleSelectChange = (value: string, field: keyof FormData) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-900 via-purple-900 to-indigo-900 text-white">
@@ -60,7 +107,7 @@ export default function CreateStrategyPage() {
               Create New Strategy
             </h1>
           </div>
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="strategy-name"
@@ -70,6 +117,8 @@ export default function CreateStrategyPage() {
               </label>
               <Input
                 id="strategy-name"
+                value={formData.name}
+                onChange={handleInputChange("name")}
                 className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
                 placeholder="Enter strategy name"
               />
@@ -86,24 +135,92 @@ export default function CreateStrategyPage() {
                 className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
                 placeholder="Describe your strategy"
                 rows={4}
+                onChange={handleInputChange("description")}
               />
             </div>
             <div>
               <label
-                htmlFor="chain"
+                htmlFor="token"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Token
+              </label>
+              <Select
+                onValueChange={(value) => handleSelectChange(value, "token")}
+              >
+                <SelectTrigger className="w-full bg-white bg-opacity-10 border-gray-700 text-white">
+                  <SelectValue placeholder="Select a token" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="eth">ETH</SelectItem>
+                  <SelectItem value="usdc">USDC</SelectItem>
+                  <SelectItem value="dai">DAI</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label
+                htmlFor="blockchain"
                 className="block text-sm font-medium text-gray-200 mb-1"
               >
                 Blockchain
               </label>
               <Select
-                id="chain"
-                className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
+                onValueChange={(value) =>
+                  handleSelectChange(value, "blockchain")
+                }
               >
-                <option value="">Select a blockchain</option>
-                <option value="ethereum">Ethereum</option>
-                <option value="binance">Binance Smart Chain</option>
-                <option value="polygon">Polygon</option>
-                <option value="avalanche">Avalanche</option>
+                <SelectTrigger className="w-full bg-white bg-opacity-10 border-gray-700 text-white">
+                  <SelectValue placeholder="Select a blockchain" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ethereum">Ethereum</SelectItem>
+                  <SelectItem value="binance">Binance Smart Chain</SelectItem>
+                  <SelectItem value="polygon">Polygon</SelectItem>
+                  <SelectItem value="avalanche">Avalanche</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label
+                htmlFor="lending-protocol"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Lending Protocol
+              </label>
+              <Select
+                onValueChange={(value) =>
+                  handleSelectChange(value, "lendingProtocol")
+                }
+              >
+                <SelectTrigger className="w-full bg-white bg-opacity-10 border-gray-700 text-white">
+                  <SelectValue placeholder="Select a lending protocol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="aave">Aave</SelectItem>
+                  <SelectItem value="aerodrome">Aerodrome</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label
+                htmlFor="swapping-protocol"
+                className="block text-sm font-medium text-gray-200 mb-1"
+              >
+                Swapping Protocol
+              </label>
+              <Select
+                onValueChange={(value) =>
+                  handleSelectChange(value, "swappingProtocol")
+                }
+              >
+                <SelectTrigger className="w-full bg-white bg-opacity-10 border-gray-700 text-white">
+                  <SelectValue placeholder="Select a swapping protocol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1inch">1inch</SelectItem>
+                  <SelectItem value="uniswap">Uniswap</SelectItem>
+                </SelectContent>
               </Select>
             </div>
             <div>
@@ -118,6 +235,7 @@ export default function CreateStrategyPage() {
                 type="number"
                 className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
                 placeholder="Enter expected APY"
+                onChange={handleInputChange("expectedApy")}
               />
             </div>
             <div>
@@ -132,8 +250,10 @@ export default function CreateStrategyPage() {
                 min={0}
                 max={100}
                 step={1}
-                value={[riskLevel]}
-                onValueChange={(value) => setRiskLevel(value[0])}
+                value={[formData.riskLevel]}
+                onValueChange={(value) =>
+                  handleSelectChange(value[0].toString(), "riskLevel")
+                }
                 className="w-full"
               />
               <div className="flex justify-between text-sm text-gray-400 mt-2">
@@ -145,47 +265,6 @@ export default function CreateStrategyPage() {
                 {riskLevel <= 33 ? "Low" : riskLevel <= 66 ? "Medium" : "High"}
               </p>
             </div>
-            <div>
-              <label
-                htmlFor="initial-investment"
-                className="block text-sm font-medium text-gray-200 mb-1"
-              >
-                Minimum Initial Investment ($)
-              </label>
-              <Input
-                id="initial-investment"
-                type="number"
-                className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
-                placeholder="Enter minimum investment"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="strategy-steps"
-                className="block text-sm font-medium text-gray-200 mb-1"
-              >
-                Strategy Steps
-              </label>
-              <Textarea
-                id="strategy-steps"
-                className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
-                placeholder="Outline the steps of your strategy"
-                rows={6}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="required-tools"
-                className="block text-sm font-medium text-gray-200 mb-1"
-              >
-                Required Tools/Platforms
-              </label>
-              <Input
-                id="required-tools"
-                className="w-full bg-white bg-opacity-10 border-gray-700 text-white"
-                placeholder="List required tools or platforms"
-              />
-            </div>
             <div className="flex justify-end space-x-4">
               <Button
                 variant="outline"
@@ -193,8 +272,12 @@ export default function CreateStrategyPage() {
               >
                 Save as Draft
               </Button>
-              <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600">
-                Publish Strategy
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600"
+              >
+                {isLoading ? "Creating Strategy..." : "Publish Strategy"}
               </Button>
             </div>
           </form>
