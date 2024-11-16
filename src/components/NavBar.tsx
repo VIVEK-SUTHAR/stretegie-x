@@ -1,6 +1,7 @@
 import { TrendingUp } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { WalletDefault } from "@coinbase/onchainkit/wallet";
 
 function NavBar() {
   return (
@@ -37,6 +38,8 @@ function NavBar() {
           Profile
         </Link>
       </nav>
+
+      <WalletDefault />
     </header>
   );
 }
