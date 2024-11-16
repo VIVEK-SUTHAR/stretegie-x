@@ -1,3 +1,4 @@
+import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -7,40 +8,7 @@ import Link from "next/link";
 export default function StrategiesPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-blue-900 via-purple-900 to-indigo-900 text-white">
-      <header className="px-4 lg:px-6 h-16 flex items-center">
-        <Link className="flex items-center justify-center" href="/">
-          <TrendingUp className="h-6 w-6 text-cyan-400" />
-          <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">
-            StrategyX
-          </span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link
-            className="text-sm font-medium hover:text-cyan-400 transition-colors"
-            href="#"
-          >
-            Dashboard
-          </Link>
-          <Link
-            className="text-sm font-medium text-cyan-400 transition-colors"
-            href="#"
-          >
-            Strategies
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-cyan-400 transition-colors"
-            href="#"
-          >
-            My Portfolio
-          </Link>
-          <Link
-            className="text-sm font-medium hover:text-cyan-400 transition-colors"
-            href="#"
-          >
-            Profile
-          </Link>
-        </nav>
-      </header>
+      <NavBar />
       <main className="flex-1 py-12 px-4 md:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
@@ -55,13 +23,7 @@ export default function StrategiesPage() {
                 type="search"
               />
             </div>
-            <Select className="bg-white bg-opacity-10 border-gray-700 text-white">
-              <option value="">All Chains</option>
-              <option value="ethereum">Ethereum</option>
-              <option value="binance">Binance Smart Chain</option>
-              <option value="polygon">Polygon</option>
-              <option value="avalanche">Avalanche</option>
-            </Select>
+
             <Button className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
               Filters
