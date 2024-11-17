@@ -1,5 +1,7 @@
 // hooks/useCreateStrategy.ts
 import { useState } from "react";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { STRATEGYXABI, STRATEGYXCONTRACTADDRESS } from "../constant";
 
 interface CreateStrategyData {
   name: string;
@@ -34,6 +36,9 @@ export const useCreateStrategy = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const { data: writeData, writeContractAsync: createStrategyOnChain } =
+    useWriteContract({});
+
   const createStrategy = async (data: CreateStrategyData) => {
     setIsLoading(true);
     setError(null);
@@ -48,43 +53,44 @@ export const useCreateStrategy = () => {
       }
 
       // First, deploy the contract
-      const deploymentResponse = await fetch("/api/deploy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          baseTokenAddress: config.baseTokenAddress,
-          destinationTokenAddress: config.destinationTokenAddress,
-          routerAddress: config.routerAddress,
-          poolProviderAddress: config.poolProviderAddress,
-        }),
-      });
+      const deploymentResponse = await fetch(
+        "https://api.devvivek.tech/deploy",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            baseTokenAddress: config.baseTokenAddress,
+            destinationTokenAddress: config.destinationTokenAddress,
+            routerAddress: config.routerAddress,
+            poolProviderAddress: config.poolProviderAddress,
+          }),
+        }
+      );
 
       if (!deploymentResponse.ok) {
         throw new Error("Contract deployment failed");
       }
 
-      const { address: contractAddress } = await deploymentResponse.json();
+      const { address: strategyAddress } = await deploymentResponse.json();
 
-      // Here you would typically save the strategy details to your database
-      // including the deployed contract address
-      const strategyData = {
-        ...data,
-        contractAddress,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Save to database (implement this API endpoint)
-      await fetch("/api/strategies", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(strategyData),
+      const tx = await createStrategyOnChain({
+        address: STRATEGYXCONTRACTADDRESS,
+        abi: STRATEGYXABI,
+        functionName: "createStrategy",
+        args: [
+          data.name, // _name
+          data.description, // _description
+          "Default Creator Name", // _creatorName
+          strategyAddress as `0x${string}`, // _strategyAddress
+          [data.blockchain], // _blockchains array
+          BigInt(Math.floor(data.expectedApy * 100)), // _expectedAPY (converting to basis points)
+          getRiskLevelString(data.riskLevel), // _riskLevel
+        ],
       });
 
-      return contractAddress;
+      return strategyAddress;
     } catch (err) {
       setError((err as Error).message);
       throw err;
@@ -99,3 +105,9 @@ export const useCreateStrategy = () => {
     error,
   };
 };
+
+function getRiskLevelString(riskLevel: number): string {
+  if (riskLevel <= 33) return "Low";
+  if (riskLevel <= 66) return "Medium";
+  return "High";
+}
